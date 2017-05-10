@@ -2,5 +2,13 @@
   {{bw-compat-icon icon extraClasses="prefix"}}
 {{/if}}
 
-{{textarea id=id value=value name=name required=required readonly=readonly disabled=disabled maxlength=maxlength class="materialize-textarea"}}
+{{textarea classNameBindings="validate:validate: isValid:valid: isInvalid:invalid:"
+  id=id
+  value=value
+  name=name
+  required=required
+  readonly=readonly
+  disabled=disabled
+  maxlength=maxlength
+  class="materialize-textarea"}}
 <label for="{{id}}" data-error={{_errorString}}>{{label}}</label>
