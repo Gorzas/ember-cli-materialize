@@ -10,13 +10,14 @@ export default MaterializeInputField.extend({
   optionLabelPath: 'content',
   optionValuePath: 'content',
 
-  didInsertElement() {
+  didRender() {
     this._super(...arguments);
     this._setupSelect();
   },
 
   _setupSelect() {
     // jscs: disable
+    this.$('select').material_select('destroy');
     this.$('select').material_select();
     // jscs: enable
   },
