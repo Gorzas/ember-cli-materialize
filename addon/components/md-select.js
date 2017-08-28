@@ -10,7 +10,7 @@ export default MaterializeInputField.extend({
   optionLabelPath: 'content',
   optionValuePath: 'content',
 
-  didInsertElement() {
+  didRender() {
     this._super(...arguments);
     this._setupSelect();
   },
