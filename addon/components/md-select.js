@@ -17,6 +17,7 @@ export default MaterializeInputField.extend({
 
   _setupSelect() {
     // jscs: disable
+    this.$('select').material_select('destroy');
     this.$('select').material_select();
     // jscs: enable
   },
