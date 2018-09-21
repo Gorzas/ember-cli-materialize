@@ -1,7 +1,9 @@
-import Ember from 'ember';
+import $ from 'jquery';
+import { computed } from '@ember/object';
+import Component from '@ember/component';
+import { typeOf } from '@ember/utils';
+import { scheduleOnce } from '@ember/runloop';
 import layout from '../templates/components/md-navbar';
-
-const { $, computed, Component, typeOf, run: { scheduleOnce } } = Ember;
 
 export default Component.extend({
   tagName: 'nav',
@@ -24,7 +26,7 @@ export default Component.extend({
   },
 
   _sideNavId: computed(function() {
-    return `${this.get('element.id')}-sidenav`;
+    return (typeof FastBoot === 'undefined') ? `${this.get('element.id')}-sidenav` : '';
   })
 
   // TODO: Unregister any listeners that $.sideNav() puts in place

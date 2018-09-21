@@ -1,12 +1,8 @@
-import {
-  moduleForComponent,
-  test
-} from 'ember-qunit';
+import { moduleForComponent, test } from 'ember-qunit';
 
 moduleForComponent('md-collapsible', {
-  unit: true
-  // specify the other units that are required for this test
-  // needs: ['component:foo', 'helper:bar']
+  unit: true,
+  needs: ['helper:bw-compat-icon']
 });
 
 test('collapsible renders', function(assert) {

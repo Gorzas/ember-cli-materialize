@@ -1,16 +1,10 @@
-import Ember from 'ember';
+import { run } from '@ember/runloop';
 
-import {
-  moduleForComponent,
-  test
-} from 'ember-qunit';
-
-const { run } = Ember;
+import { moduleForComponent, test } from 'ember-qunit';
 
 moduleForComponent('md-btn', {
-  unit: true
-  // specify the other units that are required for this test
-  // needs: ['component:foo', 'helper:bar']
+  unit: true,
+  needs: ['helper:bw-compat-icon']
 });
 
 test('button renders', function(assert) {
@@ -68,7 +62,13 @@ test('button text test', function(assert) {
     component.set('text', 'Button');
   });
 
-  assert.equal(component.$().text().trim(), 'Button');
+  assert.equal(
+    component
+      .$()
+      .text()
+      .trim(),
+    'Button'
+  );
 });
 
 test('button icon test', function(assert) {
