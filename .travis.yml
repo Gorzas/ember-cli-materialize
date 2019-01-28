@@ -1,47 +1,69 @@
 language: node_js
 node_js:
-- '4'
+- '8'
 sudo: false
 dist: trusty
 addons:
   chrome: stable
 cache:
-  directories:
-  - "$HOME/.npm"
+  yarn: true
+yarn: true
 env:
   global:
   - JOBS=1
-  matrix:
-  - EMBER_TRY_SCENARIO=ember-1.13
-  - EMBER_TRY_SCENARIO=ember-lts-2.12
-  - EMBER_TRY_SCENARIO=ember-lts-2.16
-  - EMBER_TRY_SCENARIO=ember-release
-  - EMBER_TRY_SCENARIO=ember-beta
-  - EMBER_TRY_SCENARIO=ember-canary
-matrix:
-  fast_finish: true
+
+stages:
+  - 'Tests'
+  - 'Additional Tests'
+  - 'Canary Tests'
+  - name: 'Deploy'
+    if: branch = master AND type = push
+
+jobs:
+  fail_fast: true
   allow_failures:
   - env: EMBER_TRY_SCENARIO=ember-canary
+  include:
+  - stage: Tests
+    name: Tests
+    install:
+    - yarn install --non-interactive && bower install
+    script:
+    - yarn lint:js && ember test
+  - name: Floating Dependencies
+    script:
+    - ember test
+  - stage: Additional Tests
+    node_js: 10
+    env: EMBER_TRY_SCENARIO=ember-1.13
+  - env: EMBER_TRY_SCENARIO=ember-lts-2.16
+  - env: EMBER_TRY_SCENARIO=ember-lts-2.18
+  - env: EMBER_TRY_SCENARIO=ember-release
+  - env: EMBER_TRY_SCENARIO=ember-beta
+  - env: EMBER_TRY_SCENARIO=ember-default-with-jquery
+  - stage: 'Canary Tests'
+    script:
+      - node_modules/.bin/ember try:one $EMBER_TRY_SCENARIO
+    env: EMBER_TRY_SCENARIO=ember-canary
+  - stage: 'Deploy'
+    name: 'Publish to npm'
+    install:
+      - yarn install --non-interactive
+    script: yarn semantic-release
+
 before_install:
-- npm config set spin false
-- npm install -g npm@4
+- curl -o- -L https://yarnpkg.com/install.sh | bash
+- export PATH=$HOME/.yarn/bin:$PATH
 - npm install -g bower
-- npm --version
 install:
-- npm install
-- bower install
+- yarn install --no-lockfile --non-interactive && bower install
 script:
-- npm run lint:js
-- if [ "${EMBER_TRY_SCENARIO}" = "ember-release" ]; then ember try:one $EMBER_TRY_SCENARIO;
-  else ember try:one $EMBER_TRY_SCENARIO --skip-cleanup; fi
+- yarn lint:js && ember try:one $EMBER_TRY_SCENARIO
 deploy:
   provider: heroku
   api_key:
-    secure: OeFMyi6ylYfPeNd/25cLaueVuVKbqtEHvis/J9GDiWIa7xpVD/NBS+TGxMTMaaA02Mft3Vw+MkZsPSWPU53ws1rQFAwAf98Pqx197dXoQ97Fi3wY0bipm9ZFl+bQYJg58Ydkz0sjQQbIxxtq9jn/gOtVTy5b+hQduSWjx3i15HE=
+    secure: MZDN5BsZUmmxIkOGDC1/fLem7B0E1xoTTX62P/UyzHaNTByQBEBilzhqxarfBVJ+jkrDHVLB4iPxeZKoQhphmdYCBDJvZlPTLmRcSaHBy+m80JfPvm9lkOuTVVklNjcJuwhSLC9rlRxNRL6sVbfJUgOwx/lFEKXyUYVc5Y1Cn6A=
   app: ember-materialize-demo
   on:
     repo: mike-north/ember-cli-materialize
     condition: "$EMBER_TRY_SCENARIO = ember-release"
-after_script:
-  - ls /app/.npm/_logs/
-  - cat /app/.npm/_logs/*-debug.log
